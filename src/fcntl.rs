@@ -99,7 +99,7 @@ mod ffi {
 
 pub fn open<P: ?Sized + NixPath>(path: &P, oflag: OFlag, mode: Mode) -> Result<RawFd> {
     let fd = try!(path.with_nix_path(|cstr| {
-        unsafe { ffi::open(cstr.as_ptr() as *i8, oflag.bits(), mode.bits() as c_uint) }
+        unsafe { ffi::open(cstr.as_ptr() as *const i8, oflag.bits(), mode.bits() as c_uint) }
     }));
 
     if fd < 0 {
