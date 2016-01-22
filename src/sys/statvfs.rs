@@ -145,7 +145,7 @@ pub fn statvfs<P: ?Sized + NixPath>(path: &P, stat: &mut vfs::Statvfs) -> Result
 	unsafe {
 		Errno::clear();
 		let res = try!(
-			path.with_nix_path(|path| ffi::statvfs(path.as_ptr(), stat))
+			path.with_nix_path(|path| ffi::statvfs(path.as_ptr() as *const u8, stat))
 		);
 		from_ffi(res)
 	}

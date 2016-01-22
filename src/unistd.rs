@@ -168,7 +168,7 @@ fn dup3_polyfill(oldfd: RawFd, newfd: RawFd, flags: OFlag) -> Result<RawFd> {
 #[inline]
 pub fn chdir<P: ?Sized + NixPath>(path: &P) -> Result<()> {
     let res = try!(path.with_nix_path(|cstr| {
-        unsafe { ffi::chdir(cstr.as_ptr()) }
+        unsafe { ffi::chdir(cstr.as_ptr() as *const u8) }
     }));
 
     if res != 0 {
@@ -182,7 +182,7 @@ fn to_exec_array(args: &[CString]) -> Vec<*const c_char> {
     use std::ptr;
     use libc::c_char;
 
-    let mut args_p: Vec<*const c_char> = args.iter().map(|s| s.as_ptr()).collect();
+    let mut args_p: Vec<*const c_char> = args.iter().map(|s| s.as_ptr() as *const u8).collect();
     args_p.push(ptr::null());
     args_p
 }
@@ -192,7 +192,7 @@ pub fn execv(path: &CString, argv: &[CString]) -> Result<()> {
     let args_p = to_exec_array(argv);
 
     unsafe {
-        ffi::execv(path.as_ptr(), args_p.as_ptr())
+        ffi::execv(path.as_ptr() as *const u8, args_p.as_ptr())
     };
 
     Err(Error::Sys(Errno::last()))
@@ -204,7 +204,7 @@ pub fn execve(path: &CString, args: &[CString], env: &[CString]) -> Result<()> {
     let env_p = to_exec_array(env);
 
     unsafe {
-        ffi::execve(path.as_ptr(), args_p.as_ptr(), env_p.as_ptr())
+        ffi::execve(path.as_ptr() as *const u8, args_p.as_ptr(), env_p.as_ptr())
     };
 
     Err(Error::Sys(Errno::last()))
@@ -215,7 +215,7 @@ pub fn execvp(filename: &CString, args: &[CString]) -> Result<()> {
     let args_p = to_exec_array(args);
 
     unsafe {
-        ffi::execvp(filename.as_ptr(), args_p.as_ptr())
+        ffi::execvp(filename.as_ptr() as *const u8, args_p.as_ptr())
     };
 
     Err(Error::Sys(Errno::last()))
@@ -348,7 +348,7 @@ pub fn isatty(fd: RawFd) -> Result<bool> {
 pub fn unlink<P: ?Sized + NixPath>(path: &P) -> Result<()> {
     let res = try!(path.with_nix_path(|cstr| {
     unsafe {
-        ffi::unlink(cstr.as_ptr())
+        ffi::unlink(cstr.as_ptr() as *const u8)
     }
     }));
     from_ffi(res)
@@ -357,7 +357,7 @@ pub fn unlink<P: ?Sized + NixPath>(path: &P) -> Result<()> {
 #[inline]
 pub fn chroot<P: ?Sized + NixPath>(path: &P) -> Result<()> {
     let res = try!(path.with_nix_path(|cstr| {
-        unsafe { ffi::chroot(cstr.as_ptr()) }
+        unsafe { ffi::chroot(cstr.as_ptr() as *const u8) }
     }));
 
     if res != 0 {

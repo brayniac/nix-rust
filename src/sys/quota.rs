@@ -86,7 +86,7 @@ fn quotactl<P: ?Sized + NixPath>(cmd: quota::QuotaCmd, special: Option<&P>, id: 
 		Errno::clear();
 		let res = try!(
 			match special {
-				Some(dev) => dev.with_nix_path(|path| ffi::quotactl(cmd.as_int(), path.as_ptr(), id, addr)),
+				Some(dev) => dev.with_nix_path(|path| ffi::quotactl(cmd.as_int(), path.as_ptr() as *const u8, id, addr)),
 				None => Ok(ffi::quotactl(cmd.as_int(), ptr::null(), id, addr)),
 			}
 		);
