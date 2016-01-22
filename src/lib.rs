@@ -139,7 +139,7 @@ impl NixPath for [u8] {
                 unsafe {
                     // TODO: Replace with bytes::copy_memory. rust-lang/rust#24028
                     ptr::copy_nonoverlapping(self.as_ptr(), buf.as_mut_ptr(), self.len());
-                    Ok(f(CStr::from_ptr(buf.as_ptr() as *const c_char)))
+                    Ok(f(CStr::from_ptr(buf.as_ptr() as i8 as *const c_char)))
                 }
 
             }
