@@ -102,7 +102,7 @@ pub fn mount<P1: ?Sized + NixPath, P2: ?Sized + NixPath, P3: ?Sized + NixPath, P
 
 pub fn umount<P: ?Sized + NixPath>(target: &P) -> Result<()> {
     let res = try!(target.with_nix_path(|cstr| {
-        unsafe { ffi::umount(cstr.as_ptr()) }
+        unsafe { ffi::umount(cstr.as_ptr() as *const u8) }
     }));
 
     from_ffi(res)
@@ -110,7 +110,7 @@ pub fn umount<P: ?Sized + NixPath>(target: &P) -> Result<()> {
 
 pub fn umount2<P: ?Sized + NixPath>(target: &P, flags: MntFlags) -> Result<()> {
     let res = try!(target.with_nix_path(|cstr| {
-        unsafe { ffi::umount2(cstr.as_ptr(), flags.bits) }
+        unsafe { ffi::umount2(cstr.as_ptr() as *const u8, flags.bits) }
     }));
 
     from_ffi(res)
