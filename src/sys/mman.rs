@@ -240,7 +240,7 @@ pub fn msync(addr: *const c_void, length: size_t, flags: MmapSync) -> Result<()>
 pub fn shm_open<P: ?Sized + NixPath>(name: &P, flag: OFlag, mode: Mode) -> Result<RawFd> {
     let ret = try!(name.with_nix_path(|cstr| {
         unsafe {
-            ffi::shm_open(cstr.as_ptr(), flag.bits(), mode.bits() as mode_t)
+            ffi::shm_open(cstr.as_ptr() as *const u8, flag.bits(), mode.bits() as mode_t)
         }
     }));
 
@@ -253,7 +253,7 @@ pub fn shm_open<P: ?Sized + NixPath>(name: &P, flag: OFlag, mode: Mode) -> Resul
 
 pub fn shm_unlink<P: ?Sized + NixPath>(name: &P) -> Result<()> {
     let ret = try!(name.with_nix_path(|cstr| {
-        unsafe { ffi::shm_unlink(cstr.as_ptr()) }
+        unsafe { ffi::shm_unlink(cstr.as_ptr() as *const u8) }
     }));
 
     if ret < 0 {

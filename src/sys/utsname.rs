@@ -64,7 +64,7 @@ pub fn uname() -> UtsName {
 #[inline]
 fn to_str<'a>(s: *const *const c_char) -> &'a str {
     unsafe {
-        let res = CStr::from_ptr(*s).to_bytes();
+        let res = CStr::from_ptr(*s as *const i8).to_bytes();
         from_utf8_unchecked(res)
     }
 }

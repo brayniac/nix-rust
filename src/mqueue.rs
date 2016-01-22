@@ -78,7 +78,7 @@ impl MqAttr {
 
 #[inline]
 pub fn mq_open(name: &CString, oflag: MQ_OFlag, mode: Mode, attr: &MqAttr) -> Result<MQd> {
-    let res = unsafe { ffi::mq_open(name.as_ptr(), oflag.bits(), mode.bits() as mode_t, attr as *const MqAttr) };
+    let res = unsafe { ffi::mq_open(name.as_ptr() as *const u8, oflag.bits(), mode.bits() as mode_t, attr as *const MqAttr) };
 
     if res < 0 {
         return Err(Error::Sys(Errno::last()));
@@ -88,7 +88,7 @@ pub fn mq_open(name: &CString, oflag: MQ_OFlag, mode: Mode, attr: &MqAttr) -> Re
 }
 
 pub fn mq_unlink(name: &CString) -> Result<()> {
-    let res = unsafe { ffi::mq_unlink(name.as_ptr()) };
+    let res = unsafe { ffi::mq_unlink(name.as_ptr() as *const u8) };
     from_ffi(res)
 }
 
@@ -110,8 +110,8 @@ pub fn mq_receive(mqdes: MQd, message: &mut [u8], msq_prio: u32) -> Result<usize
 }
 
 pub fn mq_send(mqdes: MQd, message: &CString, msq_prio: u32) -> Result<usize> {
-    let len = unsafe { strlen(message.as_ptr()) as size_t };
-    let res = unsafe { ffi::mq_send(mqdes, message.as_ptr(), len, msq_prio) };
+    let len = unsafe { strlen(message.as_ptr() as *const u8) as size_t };
+    let res = unsafe { ffi::mq_send(mqdes, message.as_ptr() as *const u8, len, msq_prio) };
 
     if res < 0 {
         return Err(Error::Sys(Errno::last()));

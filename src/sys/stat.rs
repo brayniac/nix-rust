@@ -53,7 +53,7 @@ bitflags! {
 pub fn mknod<P: ?Sized + NixPath>(path: &P, kind: SFlag, perm: Mode, dev: dev_t) -> Result<()> {
     let res = try!(path.with_nix_path(|cstr| {
         unsafe {
-            ffi::mknod(cstr.as_ptr(), kind.bits | perm.bits() as mode_t, dev)
+            ffi::mknod(cstr.as_ptr() as *const u8, kind.bits | perm.bits() as mode_t, dev)
         }
     }));
     from_ffi(res)
@@ -76,7 +76,7 @@ pub fn stat<P: ?Sized + NixPath>(path: &P) -> Result<FileStat> {
     let mut dst = unsafe { mem::uninitialized() };
     let res = try!(path.with_nix_path(|cstr| {
         unsafe {
-            ffi::stat(cstr.as_ptr(), &mut dst as *mut FileStat)
+            ffi::stat(cstr.as_ptr() as *const u8, &mut dst as *mut FileStat)
         }
     }));
 
@@ -91,7 +91,7 @@ pub fn lstat<P: ?Sized + NixPath>(path: &P) -> Result<FileStat> {
     let mut dst = unsafe { mem::uninitialized() };
     let res = try!(path.with_nix_path(|cstr| {
         unsafe {
-            ffi::lstat(cstr.as_ptr(), &mut dst as *mut FileStat)
+            ffi::lstat(cstr.as_ptr() as *const u8, &mut dst as *mut FileStat)
         }
     }));
 
